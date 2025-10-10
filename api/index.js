@@ -7,8 +7,14 @@ import bodyParser from "body-parser";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "../swagger.json";
 import { AccessError, InputError } from "./error";
-import { save } from "./service";
 import mongoose from "mongoose";
+import {
+  save,
+  getEmailFromAuthorization,
+  login,
+  logout,
+  register,
+} from "./service"
 
 const { DEV_PORT, DB_CONNECTION_STRING } = process.env;
 
@@ -34,6 +40,43 @@ const catchErrors = (fn) => async(req, res) => {
     }
   }
 };
+
+/************************************************************* 
+                        Auth Functions
+*************************************************************/
+
+const authed = (fn) => async(req, res) => {
+  const email = getEmailFromAuthorization(req.header("Authorization"));
+  await fn(req, res, email);
+}
+
+app.post(
+  "/admin/auth/login",
+  catchErrors(async(req, res) => {
+    const { email, password } = req.body;
+    const token = await login(email, password);
+    return res.json({ token });
+  })
+);
+
+app.post(
+  "/admin/auth/register",
+  catchErrors(async(req, res) => {
+    const { email, password, name } = req.body;
+    const token = await register(email, password, name);
+    return res.json({ token });
+  })
+);
+
+app.post(
+  "/admin/auth/logout",
+  catchErrors(
+    authed(async(req, res, email) => {
+      await logout(email);
+      return res.json({});
+    })
+  )
+);
 
 /************************************************************* 
                         Running Server

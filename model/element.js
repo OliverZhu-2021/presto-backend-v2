@@ -22,7 +22,7 @@ const elementSchema = new Schema({
     type: Number,
     required: true,
   },
-  poistion_Y: {
+  position_Y: {
     type: Number,
     required: true,
   },

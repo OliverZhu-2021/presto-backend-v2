@@ -14,6 +14,8 @@ import {
   login,
   logout,
   register,
+  getStore,
+  setStore
 } from "./service"
 
 const { DEV_PORT, DB_CONNECTION_STRING } = process.env;
@@ -73,6 +75,30 @@ app.post(
   catchErrors(
     authed(async(req, res, email) => {
       await logout(email);
+      return res.json({});
+    })
+  )
+);
+
+/************************************************************* 
+                        Store Functions
+*************************************************************/
+
+app.get(
+  "/store",
+  catchErrors(
+    authed(async(req, res, email) => {
+      const store = await getStore(email);
+      return res.json({ store });
+    })
+  )
+);
+
+app.put(
+  "/store",
+  catchErrors(
+    authed(async(req, res, email) => {
+      await setStore(email, req.body.store);
       return res.json({});
     })
   )

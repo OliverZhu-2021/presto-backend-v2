@@ -199,3 +199,27 @@ export const register = (email, password, name) =>
 /***************************************************************
                        Store Functions
 ***************************************************************/
+
+export const getStore = (email) => 
+  userLock((resolve, reject) => {
+    const user = activeSessions.get(email);
+
+    if(!user) {
+      reject(new Error(`User not found for email: ${email}`));
+    }
+
+    const store = user.store;
+    resolve(store);
+  });
+
+export const setStore = (email, store) => 
+  userLock((resolve, reject) => {
+    const user = activeSessions.get(email);
+    
+    if(user) {
+      user.store = store;
+      activeSessions.set(email, user);
+    }
+
+    resolve();
+  });

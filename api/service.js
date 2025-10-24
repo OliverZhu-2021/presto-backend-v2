@@ -28,7 +28,8 @@ const update = async(activeSessions) =>
 
         for (const session of activeSessions.values()) { 
           if(session.store && session.store.length != 0) {
-            for(const slides of session.store) {
+            for(let j = session.store.length - 1; j >=0; j--) {
+              const slides = session.store[j]
               if(slides.pages && slides.pages.length != 0) {
                 for(const page of slides.pages) {
                   if(page.elements && page.elements.length != 0) {
@@ -72,12 +73,21 @@ const update = async(activeSessions) =>
                 }))
               }
               if(slides._id) {
-                slidesUpdateOps.push({
-                  updateOne: {
-                    filter: { _id: slides._id},
-                    update: {$set: updatedSlides},
-                  }
-                });   // Collect direct update
+                if("toDelete" in slides) {
+                  slidesUpdateOps.push({
+                    deleteOne: {
+                      filter: {_id: slides._id}
+                    }
+                  });
+                  session.store.splice(j, 1);
+                } else {
+                    slidesUpdateOps.push({
+                    updateOne: {
+                      filter: { _id: slides._id},
+                      update: {$set: updatedSlides},
+                    }
+                  });   // Collect direct update
+                }
               } else {
                 const newSlides = await Slides.create(updatedSlides);  // Create if not in db
                 slides._id = newSlides._id;

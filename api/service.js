@@ -32,15 +32,28 @@ const update = async(activeSessions) =>
               if(slides.pages && slides.pages.length != 0) {
                 for(const page of slides.pages) {
                   if(page.elements && page.elements.length != 0) {
-                    for(const element of page.elements) {
+                    for(let i = page.elements.length - 1; i >=0; i--) {
+                      const element = page.elements[i];
+                      
                       // Update element
                       if(element._id) {
-                        elementUpdateOps.push({
+                        if("toDelete" in element) {
+                          elementUpdateOps.push({
+                            deleteOne: {
+                              filter: {_id: element._id}
+                            }
+                          });
+
+                          // Remove from cache
+                          page.elements.splice(i, 1);
+                        } else {
+                          elementUpdateOps.push({
                           updateOne: {
                             filter: { _id: element._id },
                             update: { $set: element },
                           }
                         });   // Collect direct update
+                        }
                       } else {
                         const newElement = await Element.create(element);  // Create if not in db
                         element._id = newElement._id;

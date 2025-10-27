@@ -23,7 +23,7 @@ const { DEV_PORT, DB_CONNECTION_STRING } = process.env;
 const app = express();
 
 const corsOptions = {
-  origin: '*',
+  origin: 'https://presto-frontend-v2.vercel.app',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
